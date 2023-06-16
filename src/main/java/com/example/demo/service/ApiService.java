@@ -12,10 +12,15 @@ public class ApiService {
     @Autowired
     private AuthController authController;
 
-    public ResponseEntity<String> getCall(String url) {
+    private HttpHeaders getHeaders(){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + authController.getManagementApiToken());
+        return headers;
+    }
+
+    public ResponseEntity<String> getCall(String url) {
+        HttpHeaders headers = getHeaders();
 
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
@@ -25,9 +30,7 @@ public class ApiService {
     }
 
     public ResponseEntity<String> postCall(String url, String requestBody) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + authController.getManagementApiToken());
+        HttpHeaders headers = getHeaders();
 
         HttpEntity<String> request = new HttpEntity<String>(requestBody, headers);
         RestTemplate restTemplate = new RestTemplate();
