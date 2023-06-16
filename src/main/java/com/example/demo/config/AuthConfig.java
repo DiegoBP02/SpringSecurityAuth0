@@ -74,4 +74,8 @@ public class AuthConfig {
     public String getUsersUrl() {
         return "https://" + getDomain() + "/api/v2/users";
     }
+
+    public String getUsersByEmailUrl() {
+        return "https://" + getDomain() + "/api/v2/users-by-email?email=";
+    }
 }
