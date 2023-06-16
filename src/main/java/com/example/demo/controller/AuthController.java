@@ -79,9 +79,10 @@ public class AuthController {
         HttpEntity<String> request = new HttpEntity<String>(requestBody.toString(), headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        HashMap<String, String> result = restTemplate
+        HashMap<?, ?> result = restTemplate
                 .postForObject("https://" + managementDomain + "/oauth/token", request, HashMap.class);
 
-        return result.get("access_token");
+        assert result != null;
+        return (String) result.get("access_token");
     }
 }

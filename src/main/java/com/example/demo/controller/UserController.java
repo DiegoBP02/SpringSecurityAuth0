@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.config.AuthConfig;
+import com.example.demo.service.ApiService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,43 +22,28 @@ public class UserController {
     @Autowired
     private AuthConfig authConfig;
 
+    @Autowired
+    private ApiService apiService;
+
     @Value(value = "${com.auth0.managementDomain}")
     private String managementDomain;
 
     @GetMapping(value = "/users")
     @ResponseBody
     public ResponseEntity<String> users(HttpServletRequest request, HttpServletResponse response){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + authController.getManagementApiToken());
-
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> result = restTemplate
-                .exchange("https://" + managementDomain + "/api/v2/users", HttpMethod.GET,
-                        entity, String.class);
-        return result;
+        return apiService.getCall(authConfig.getUsersUrl());
     }
 
     @GetMapping(value = "/createUser")
     @ResponseBody
     public ResponseEntity<String> createUser(HttpServletResponse response){
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("email", "randomEmail@email.com");
-        requestBody.put("given_name", "Name");
-        requestBody.put("family_name", "Family");
-        requestBody.put("connection", "Username-Password-Authentication");
-        requestBody.put("password", "Pa33w0rd");
+        JSONObject request = new JSONObject();
+        request.put("email", "randomEmail@email.com");
+        request.put("given_name", "Name");
+        request.put("family_name", "Family");
+        request.put("connection", "Username-Password-Authentication");
+        request.put("password", "Pa33w0rd");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " +authController.getManagementApiToken());
-
-        HttpEntity<String> request = new HttpEntity<String>(requestBody.toString(), headers);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> result = restTemplate.postForEntity(authConfig.getUsersUrl(), request, String.class);
-
-        return result;
+        return apiService.postCall(authConfig.getUsersUrl(), request.toString());
     }
 }
